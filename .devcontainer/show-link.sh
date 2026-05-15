@@ -1,10 +1,10 @@
 #!/bin/bash
 
-CONFIG="/etc/xray/g2ray.json"
+CONFIG="/etc/config.json"
 
-UUID=$(grep -o '"id": *"[^"]*"' "$CONFIG" | head -1 | grep -o '"[^"]*"$' | tr -d '"')
+UUID=$(jq -r '.inbounds[0].settings.clients[0].id' "$CONFIG")
 
-if [ -z "$UUID" ]; then
+if [ -z "$UUID" ] || [ "$UUID" = "null" ]; then
   echo "[g2ray] UUID not found."
   exit 1
 fi
