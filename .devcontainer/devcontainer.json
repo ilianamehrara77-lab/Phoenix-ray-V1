@@ -1,9 +1,11 @@
 {
   "name": "ghtun",
+
   "build": {
     "dockerfile": "./Dockerfile",
     "context": "."
   },
+
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": false
@@ -12,10 +14,12 @@
       "version": "latest"
     }
   },
+
   "postAttachCommand": {
     "public": "gh codespace ports visibility 443:public -c $CODESPACE_NAME",
-    "xray": "sudo /usr/local/bin/xray -c /etc/config.json"
+    "start": "bash /usr/local/bin/start.sh"
   },
+
   "portsAttributes": {
     "443": {
       "label": "xray",
@@ -23,7 +27,9 @@
       "onAutoForward": "silent"
     }
   },
+
   "forwardPorts": [443],
+
   "hostRequirements": {
     "cpus": 2
   }
