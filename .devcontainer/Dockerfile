@@ -1,16 +1,40 @@
 FROM debian:bookworm-slim
 
+# Copy files
 COPY install.sh /app/install.sh
+COPY config.json /etc/config.json
+COPY show-link.sh /usr/local/bin/show-link.sh
+COPY start.sh /usr/local/bin/start.sh
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash git curl wget unzip tzdata openssl ca-certificates \
+# Install dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       bash \
+       git \
+       curl \
+       wget \
+       unzip \
+       tzdata \
+       openssl \
+       ca-certificates \
+       uuid-runtime \
+       tmux \
+       jq \
+       nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-RUN chmod +x /app/install.sh && /app/install.sh
-COPY config.json /etc/config.json
+# Run installer
+RUN chmod +x /app/install.sh \
+    && /app/install.sh
 
-RUN echo 'echo -e "\n✅ VLESS LINK:\nvless://550e8400-e29b-41d4-a716-446655440000@94.130.50.12:443?encryption=none&security=tls&type=xhttp&mode=packet-up&sni=${CODESPACE_NAME}-443.app.github.dev&path=%2F#ghtun"' >> /etc/bash.bashrc
+# Make scripts executable
+RUN chmod +x /usr/local/bin/show-link.sh \
+    && chmod +x /usr/local/bin/start.sh
 
-CMD ["/usr/local/bin/xray", "-c", "/etc/config.json"]
+# Expose VLESS port
+EXPOSE 443
+
+# Start through script (UUID generation support)
+CMD ["/usr/local/bin/start.sh"]
